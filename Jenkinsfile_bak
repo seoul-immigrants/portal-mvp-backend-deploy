@@ -1,0 +1,82 @@
+// Pipeline to build spring boot gradle.
+pipeline {
+    agent any
+
+    environment {
+        gitRepositoryUrl = "https://github.com/seoul-immigrants/portal-mvp-backend"
+        gitRepositoryBranch = "main"
+        githubCredentialsId = "github_credentials_id"
+
+        buildGradleDir = "/var/jenkins_home/workspace/portal-mvp-dev-backend"
+
+        dockerImageName = "ehdrud1129/portal-mvp-dev-backend"
+        dockerCredentialsId = "docker_credentials_id"
+        dockerImage = ""
+    }
+
+    stages {
+        stage("Prepare") {
+          steps {
+            echo "Clone repository..."
+            git url: gitRepositoryUrl,
+              branch: gitRepositoryBranch,
+              credentialsId: githubCredentialsId
+            }
+            post {
+             success { 
+               echo "Successfully cloned repository."
+             }
+           	 failure {
+               error "This pipeline stops here."
+             }
+          }
+        }
+
+        stage("Bulid Gradle") {
+          agent any
+          steps {
+            echo "Bulid gradle..."
+            dir (buildGradleDir){
+                sh './gradlew clean build'
+            }
+          }
+          post {
+            failure {
+              error "This pipeline stops here."
+            }
+          }
+        }
+        
+        stage("Bulid Docker") {
+          agent any
+          steps {
+            echo "Bulid docker..."
+            script {
+                dockerImage = docker.build dockerImageName
+            }
+          }
+          post {
+            failure {
+              error "This pipeline stops here."
+            }
+          }
+        }
+
+        stage("Push Docker") {
+          agent any
+          steps {
+            echo "Push docker..."
+            script {
+                docker.withRegistry( "", dockerCredentialsId) {
+                    dockerImage.push("latest")
+                }
+            }
+          }
+          post {
+            failure {
+              error "This pipeline stops here..."
+            }
+          }
+        }
+    }
+}
