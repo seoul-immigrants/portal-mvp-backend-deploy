@@ -99,7 +99,7 @@ pipeline {
                 usernamePassword(credentialsId: "${APP_IMAGE_REPO_CREDENTIAL_ID}",
                 usernameVariable: "APP_IMAGE_REPO_USERNAME",
                 passwordVariable: "APP_IMAGE_REPO_PASSWORD")]) {
-                sh "docker login -u $APP_IMAGE_REPO_USERNAME -p $APP_IMAGE_REPO_PASSWORD
+                sh "docker login -u $APP_IMAGE_REPO_USERNAME -p $APP_IMAGE_REPO_PASSWORD hub.docker.com
                 docker build --pull --force-rm -file=Dockerfile --tag=$IMAGE_LOC .
 
                 # Docker push
