@@ -15,8 +15,6 @@ pipeline {
       GIT_DEPLOY_REPOSITORY_NAME = "portal-mvp-backend-deploy"
       GIT_REPOSITORY_URL = "https://github.com/seoul-immigrants/portal-mvp-backend.git"
       GIT_DEPLOY_REPOSITORY_URL = "https://github.com/seoul-immigrants/portal-mvp-backend-deploy.git"
-      BUILD_GRADLE_DIR = "/var/jenkins_home/workspace/portal-mvp-dev-backend"
-      BUILD_DOCKER_DIR = "/var/jenkins_home/workspace/portal-mvp-dev-backend-deploy"
 
       APP_IMAGE_REPO_CREDENTIAL_ID = "docker_credentials_id"
       IMAGE_REPO = "ehdrud1129/portal-mvp-dev-backend"
@@ -69,7 +67,7 @@ pipeline {
           }
           steps {
             echo "Bulid gradle..."
-            dir("${BUILD_GRADLE_DIR}") {
+            dir("${GIT_REPOSITORY_NAME}") {
                 sh "./gradlew clean build"
             }
           }
@@ -90,10 +88,10 @@ pipeline {
               env.IMAGE_LOC = env.IMAGE_REPO + ":" + env.IMAGE_TAG
             }
             echo("================================\nTAG: ${env.IMAGE_TAG}\n================================")
-            dir("${BUILD_GRADLE_DIR}") {
+            dir("${GIT_REPOSITORY_NAME}") {
               sh "cp target/*.jar ../${GIT_DEPLOY_REPOSITORY_NAME}/app.jar"
             }
-            dir("${BUILD_DOCKER_DIR}") {
+            dir("${GIT_DEPLOY_REPOSITORY_NAME}") {
               // Docker build
               withCredentials([
                 usernamePassword(credentialsId: "${APP_IMAGE_REPO_CREDENTIAL_ID}",
