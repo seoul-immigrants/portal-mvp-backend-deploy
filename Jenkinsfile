@@ -84,10 +84,8 @@ pipeline {
           steps {
             echo "Bulid docker..."
             script {
-              env.IMAGE_TAG = convertTag(tagPattern: "${params.tag}")
-              env.IMAGE_LOC = env.IMAGE_REPO + ":" + env.IMAGE_TAG
+              env.IMAGE_LOC = env.IMAGE_REPO + ":" + "${params.tag}"
             }
-            echo("================================\nTAG: ${env.IMAGE_TAG}\n================================")
             dir("${GIT_REPOSITORY_NAME}") {
               sh "cp target/*.jar ../${GIT_DEPLOY_REPOSITORY_NAME}/app.jar"
             }
